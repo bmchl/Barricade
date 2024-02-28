@@ -12,7 +12,8 @@ import SwiftData
 struct BarricadeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Concert.self,
+            Song.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -29,4 +30,5 @@ struct BarricadeApp: App {
         }
         .modelContainer(sharedModelContainer)
     }
+    
 }

@@ -7,43 +7,67 @@
 
 import SwiftUI
 import SwiftData
+import PhotosUI
+
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    @Query private var items: [Concert]
+    @State private var showConcertCreationSheet = false
+    @State private var concertType = 0
+    
+   
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+    
+
+            NavigationStack {
+                
+                VStack {
+                       Picker("Concert Type", selection: $concertType) {
+                           Text("Past").tag(0)
+                           Text("Upcoming").tag(1)
+                       }.pickerStyle(.segmented).padding()
+                       if concertType == 0 {
+                           List {
+                               ForEach(items) {
+                                   item in !item.isInFuture() ? 
+                                   NavigationLink {ConcertPageView(concert: .constant(item))} label: {
+                                       ConcertItemView(concert: .constant(item))} : nil
+                               }.onDelete(perform: deleteItems)
+                           }
+                       } else {
+                           List {
+                               ForEach(items) {
+                                   item in item.isInFuture() ? NavigationLink {} label: {
+                                       ConcertItemView(concert: .constant(item))} : nil
+                               }.onDelete(perform: deleteItems)
+                           }
+                       }
+                   }
+                
+                .toolbar {
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        EditButton()
                     }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    ToolbarItem {
+                        Button(action: addItem) {
+                            Label("Add Item", systemImage: "plus")
+                            
+                        }
                     }
-                }
+                }.navigationTitle("Concerts")
+                    .sheet(isPresented: $showConcertCreationSheet) {
+                        ConcertCreationSheet(showConcertCreationSheet: $showConcertCreationSheet)
+                    }
             }
-        } detail: {
-            Text("Select an item")
-        }
+    
+      
+        
     }
 
     private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
+        showConcertCreationSheet = true
     }
 
     private func deleteItems(offsets: IndexSet) {
@@ -56,6 +80,14 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+       let container = try! ModelContainer(for: Concert.self, configurations: config)
+
+       for i in 1..<10 {
+           let concert = placeholderConcert
+           container.mainContext.insert(concert)
+       }
+    
+    return ContentView()
+        .modelContainer(container)
 }
