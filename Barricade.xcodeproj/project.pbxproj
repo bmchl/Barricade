@@ -22,6 +22,7 @@
 		27C9D1902DA1DDBE00167D94 /* ConcertPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C9D18F2DA1DDB700167D94 /* ConcertPageViewModel.swift */; };
 		27C9D1932DA1FEE200167D94 /* ShazamService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C9D1922DA1FEE200167D94 /* ShazamService.swift */; };
 		27C9D1972DA2148800167D94 /* ShazamKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27C9D1952DA2148200167D94 /* ShazamKit.framework */; };
+		27C9D19E2DA232A300167D94 /* VideoDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C9D19D2DA232A300167D94 /* VideoDetectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		27C9D1922DA1FEE200167D94 /* ShazamService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShazamService.swift; sourceTree = "<group>"; };
 		27C9D1952DA2148200167D94 /* ShazamKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShazamKit.framework; path = System/Library/Frameworks/ShazamKit.framework; sourceTree = SDKROOT; };
 		27C9D19A2DA215C300167D94 /* Barricade.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Barricade.entitlements; sourceTree = "<group>"; };
+		27C9D19D2DA232A300167D94 /* VideoDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 		27C9D17B2DA1CF4100167D94 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				27C9D19D2DA232A300167D94 /* VideoDetectionView.swift */,
 				27302EFE2B7ED54200F72E8B /* ContentView.swift */,
 				27302F0C2B7EDE9F00F72E8B /* PickerView.swift */,
 				27302F102B7FE02600F72E8B /* ConcertCreationSheet.swift */,
@@ -212,6 +215,7 @@
 				27302F152B7FE6DE00F72E8B /* ConcertItemView.swift in Sources */,
 				27C9D1932DA1FEE200167D94 /* ShazamService.swift in Sources */,
 				27302F0D2B7EDE9F00F72E8B /* PickerView.swift in Sources */,
+				27C9D19E2DA232A300167D94 /* VideoDetectionView.swift in Sources */,
 				27302EFF2B7ED54200F72E8B /* ContentView.swift in Sources */,
 				27C9D1902DA1DDBE00167D94 /* ConcertPageViewModel.swift in Sources */,
 				27302F192B8004E000F72E8B /* Song.swift in Sources */,

@@ -39,65 +39,90 @@ struct ShazamMatchResult {
     }
 }
 
-class ShazamService: NSObject, SHSessionDelegate {
+class ShazamService: NSObject {
     static let shared = ShazamService()
     
-    var lastResult: ShazamMatchResult?
-        
-    // SHSessionDelegate methods
-    func session(_ session: SHSession, didFind match: SHMatch) {
-        print("Audio matched!")
-        lastResult = ShazamMatchResult(match: match)
-    }
+    private var managedSession: SHManagedSession?
+    private var player: AVPlayer?
     
-    func session(_ session: SHSession, didNotFindMatchFor signature: SHSignature, error: Error?) {
-        if let error = error {
-            print("Error matching audio: \(error.localizedDescription)")
-            lastResult = ShazamMatchResult(error: error)
-        } else {
-            print("No match found")
-            lastResult = ShazamMatchResult(error: NSError(domain: "ShazamService", code: 1001, userInfo: [NSLocalizedDescriptionKey : "No match found"]))
-        }
-        
-    }
-    
-    
-    
-    func matchAudioData(_ data: Data) async {
+    // Updated to return the player for UI display
+    func matchAudioData(_ data: Data) async -> (AVPlayer?, ShazamMatchResult) {
         // Check if running in a simulator
         #if targetEnvironment(simulator)
         print("Running in simulator - returning mock data")
-        return mockShazamResult()
+        return (nil, mockShazamResult())
         #else
         
         do {
-            // Create a ShazamKit session
-            let session = SHSession()
-            session.delegate = self
-            
-            // Create a file URL for the data
+            // Create a temporary file from the video data
             let tempDirectory = FileManager.default.temporaryDirectory
             let tempFile = tempDirectory.appendingPathComponent("temp_audio.mp4")
-            
-            // Write the data to a temporary file
             try data.write(to: tempFile)
             
-            // Create an AVAsset from the video file
+            // Log the video file details
             let asset = AVAsset(url: tempFile)
+            let duration = try await asset.load(.duration)
+            let audioTracks = try await asset.loadTracks(withMediaType: .audio)
+            print("📹 Video duration: \(duration.seconds) seconds")
+            print("🔊 Audio tracks count: \(audioTracks.count)")
             
-            // Using the built-in signature generator with AVAsset
-            print("Generating signature from asset...")
-            let signature = try await SHSignatureGenerator.signature(from: asset)
-            print("Signature generated successfully with duration: \(signature.duration)")
+            // Set up player to play the video
+            let playerItem = AVPlayerItem(asset: asset)
+            self.player = AVPlayer(playerItem: playerItem)
             
+            // Set up audio session for playback and recording
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: .defaultToSpeaker)
+            try audioSession.setActive(true)
             
-            print("Matching signature...")
-            session.match(signature)
+            // Create a managed session which handles recording and matching
+            print("🎤 Starting managed session with microphone...")
+            let session = SHManagedSession()
+            self.managedSession = session
+            
+            // Prepare the session (optional but reduces latency)
+            try await session.prepare()
+            
+            // Play the video
+            print("▶️ Playing video...")
+            player?.play()
+            
+            print("🎵 Listening for music...")
+            
+            // Get the result from the managed session
+            let result = await session.result()
+            
+            // Process the result
+            switch result {
+            case .match(let match):
+                print("✅ Match found: \(match.mediaItems.first?.title ?? "Unknown")")
+                return (player, ShazamMatchResult(match: match))
+                
+            case .noMatch:
+                print("❌ No match found")
+                return (player, ShazamMatchResult(error: NSError(domain: "ShazamService", 
+                                                      code: 1001, 
+                                                      userInfo: [NSLocalizedDescriptionKey: "No match found"])))
+                
+            case .error(let error, _):
+                print("❌ Error during matching: \(error.localizedDescription), code: \((error as NSError).code)")
+                return (player, ShazamMatchResult(error: error))
+            }
+            
         } catch {
-            print("Error generating signature or matching: \(error.localizedDescription)")
-            lastResult = ShazamMatchResult(error: error)
+            print("Error processing audio: \(error.localizedDescription)")
+            return (nil, ShazamMatchResult(error: error))
         }
         #endif
+    }
+    
+    func stopPlayback() {
+        // Stop the player and clean up
+        player?.pause()
+        player = nil
+        try? AVAudioSession.sharedInstance().setActive(false)
+        managedSession?.cancel()
+        managedSession = nil
     }
     
     // Return mock data for simulator testing

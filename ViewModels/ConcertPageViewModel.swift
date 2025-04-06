@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import AVFoundation
 
 extension ConcertPageView {
     @Observable
@@ -15,6 +16,7 @@ extension ConcertPageView {
         
         var isDetecting = false
         var detectionResult: ShazamMatchResult?
+        var currentPlayer: AVPlayer?
         
         // Helper to find the current concert
         private var concert: Concert?
@@ -31,18 +33,19 @@ extension ConcertPageView {
         func processVideoData(_ data: Data, modelContext: ModelContext) async -> ShazamMatchResult {
             isDetecting = true
             
-            // Use ShazamKit to detect song from the video data
-            await shazamService.matchAudioData(data)
-            detectionResult = shazamService.lastResult
+            // Use ShazamKit to detect song from the video data, also get the player
+            let (player, result) = await shazamService.matchAudioData(data)
+            self.currentPlayer = player
+            self.detectionResult = result
             
-            if ((detectionResult?.isSuccess) != nil), let songTitle = detectionResult?.songTitle {
+            if result.isSuccess, let songTitle = result.songTitle {
                 // Check if the song already exists in the setlist
                 if let concert = findConcert(in: modelContext),
                    !concert.setlist.contains(where: { $0.title == songTitle }) {
                     // Create and add the new song to the setlist
                     let newSong = Song(title: songTitle)
                     
-                    if let artist = detectionResult?.artist {
+                    if let artist = result.artist {
                         // Add artist information if available
                         newSong.artist = artist
                     }
@@ -55,8 +58,14 @@ extension ConcertPageView {
                 }
             }
             
+            return result
+        }
+        
+        // Call this when detection is complete or canceled
+        func stopDetection() {
             isDetecting = false
-            return detectionResult ?? ShazamMatchResult()
+            shazamService.stopPlayback()
+            currentPlayer = nil
         }
         
         // Helper to find the current concert
