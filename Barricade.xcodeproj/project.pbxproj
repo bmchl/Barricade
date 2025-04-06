@@ -9,35 +9,40 @@
 /* Begin PBXBuildFile section */
 		27302EFD2B7ED54200F72E8B /* BarricadeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302EFC2B7ED54200F72E8B /* BarricadeApp.swift */; };
 		27302EFF2B7ED54200F72E8B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302EFE2B7ED54200F72E8B /* ContentView.swift */; };
-		27302F012B7ED54200F72E8B /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F002B7ED54200F72E8B /* Item.swift */; };
 		27302F032B7ED54300F72E8B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27302F022B7ED54300F72E8B /* Assets.xcassets */; };
 		27302F062B7ED54300F72E8B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27302F052B7ED54300F72E8B /* Preview Assets.xcassets */; };
 		27302F0D2B7EDE9F00F72E8B /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F0C2B7EDE9F00F72E8B /* PickerView.swift */; };
-		27302F0F2B7FDCE300F72E8B /* ConcertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F0E2B7FDCE300F72E8B /* ConcertsView.swift */; };
 		27302F112B7FE02600F72E8B /* ConcertCreationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F102B7FE02600F72E8B /* ConcertCreationSheet.swift */; };
 		27302F132B7FE07800F72E8B /* Concert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F122B7FE07800F72E8B /* Concert.swift */; };
 		27302F152B7FE6DE00F72E8B /* ConcertItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F142B7FE6DE00F72E8B /* ConcertItemView.swift */; };
 		27302F172B7FF82C00F72E8B /* ConcertPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F162B7FF82C00F72E8B /* ConcertPageView.swift */; };
 		27302F192B8004E000F72E8B /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F182B8004E000F72E8B /* Song.swift */; };
 		27302F1B2B8007F600F72E8B /* SongPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27302F1A2B8007F600F72E8B /* SongPageView.swift */; };
+		27C9D1822DA1D16C00167D94 /* ConcertCreationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C9D1812DA1D16C00167D94 /* ConcertCreationViewModel.swift */; };
+		27C9D1902DA1DDBE00167D94 /* ConcertPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C9D18F2DA1DDB700167D94 /* ConcertPageViewModel.swift */; };
+		27C9D1932DA1FEE200167D94 /* ShazamService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C9D1922DA1FEE200167D94 /* ShazamService.swift */; };
+		27C9D1972DA2148800167D94 /* ShazamKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27C9D1952DA2148200167D94 /* ShazamKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		27302EF92B7ED54200F72E8B /* Barricade.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Barricade.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27302EFC2B7ED54200F72E8B /* BarricadeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarricadeApp.swift; sourceTree = "<group>"; };
 		27302EFE2B7ED54200F72E8B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		27302F002B7ED54200F72E8B /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		27302F022B7ED54300F72E8B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27302F052B7ED54300F72E8B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		27302F0C2B7EDE9F00F72E8B /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
-		27302F0E2B7FDCE300F72E8B /* ConcertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcertsView.swift; sourceTree = "<group>"; };
 		27302F102B7FE02600F72E8B /* ConcertCreationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcertCreationSheet.swift; sourceTree = "<group>"; };
 		27302F122B7FE07800F72E8B /* Concert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Concert.swift; sourceTree = "<group>"; };
 		27302F142B7FE6DE00F72E8B /* ConcertItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcertItemView.swift; sourceTree = "<group>"; };
 		27302F162B7FF82C00F72E8B /* ConcertPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcertPageView.swift; sourceTree = "<group>"; };
 		27302F182B8004E000F72E8B /* Song.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
 		27302F1A2B8007F600F72E8B /* SongPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongPageView.swift; sourceTree = "<group>"; };
-		27302F1C2B801EC900F72E8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		27C9D17E2DA1D08400167D94 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		27C9D1812DA1D16C00167D94 /* ConcertCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcertCreationViewModel.swift; sourceTree = "<group>"; };
+		27C9D18F2DA1DDB700167D94 /* ConcertPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcertPageViewModel.swift; sourceTree = "<group>"; };
+		27C9D1922DA1FEE200167D94 /* ShazamService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShazamService.swift; sourceTree = "<group>"; };
+		27C9D1952DA2148200167D94 /* ShazamKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShazamKit.framework; path = System/Library/Frameworks/ShazamKit.framework; sourceTree = SDKROOT; };
+		27C9D19A2DA215C300167D94 /* Barricade.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Barricade.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27C9D1972DA2148800167D94 /* ShazamKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,9 +60,17 @@
 		27302EF02B7ED54200F72E8B = {
 			isa = PBXGroup;
 			children = (
-				27302F182B8004E000F72E8B /* Song.swift */,
-				27302EFB2B7ED54200F72E8B /* Barricade */,
+				27C9D19A2DA215C300167D94 /* Barricade.entitlements */,
+				27C9D1912DA1FECA00167D94 /* Services */,
+				27C9D1802DA1D13E00167D94 /* ViewModels */,
+				27C9D17A2DA1CF2200167D94 /* Models */,
 				27302EFA2B7ED54200F72E8B /* Products */,
+				27302EFC2B7ED54200F72E8B /* BarricadeApp.swift */,
+				27C9D17B2DA1CF4100167D94 /* Views */,
+				27302F022B7ED54300F72E8B /* Assets.xcassets */,
+				27302F042B7ED54300F72E8B /* Preview Content */,
+				27C9D17E2DA1D08400167D94 /* Info.plist */,
+				27C9D1942DA2148200167D94 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -68,32 +82,59 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		27302EFB2B7ED54200F72E8B /* Barricade */ = {
-			isa = PBXGroup;
-			children = (
-				27302F1C2B801EC900F72E8B /* Info.plist */,
-				27302EFC2B7ED54200F72E8B /* BarricadeApp.swift */,
-				27302EFE2B7ED54200F72E8B /* ContentView.swift */,
-				27302F002B7ED54200F72E8B /* Item.swift */,
-				27302F022B7ED54300F72E8B /* Assets.xcassets */,
-				27302F042B7ED54300F72E8B /* Preview Content */,
-				27302F0C2B7EDE9F00F72E8B /* PickerView.swift */,
-				27302F0E2B7FDCE300F72E8B /* ConcertsView.swift */,
-				27302F102B7FE02600F72E8B /* ConcertCreationSheet.swift */,
-				27302F122B7FE07800F72E8B /* Concert.swift */,
-				27302F142B7FE6DE00F72E8B /* ConcertItemView.swift */,
-				27302F162B7FF82C00F72E8B /* ConcertPageView.swift */,
-				27302F1A2B8007F600F72E8B /* SongPageView.swift */,
-			);
-			path = Barricade;
-			sourceTree = "<group>";
-		};
 		27302F042B7ED54300F72E8B /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
 				27302F052B7ED54300F72E8B /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		27C9D17A2DA1CF2200167D94 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				27302F182B8004E000F72E8B /* Song.swift */,
+				27302F122B7FE07800F72E8B /* Concert.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		27C9D17B2DA1CF4100167D94 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				27302EFE2B7ED54200F72E8B /* ContentView.swift */,
+				27302F0C2B7EDE9F00F72E8B /* PickerView.swift */,
+				27302F102B7FE02600F72E8B /* ConcertCreationSheet.swift */,
+				27302F142B7FE6DE00F72E8B /* ConcertItemView.swift */,
+				27302F162B7FF82C00F72E8B /* ConcertPageView.swift */,
+				27302F1A2B8007F600F72E8B /* SongPageView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		27C9D1802DA1D13E00167D94 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				27C9D18F2DA1DDB700167D94 /* ConcertPageViewModel.swift */,
+				27C9D1812DA1D16C00167D94 /* ConcertCreationViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		27C9D1912DA1FECA00167D94 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				27C9D1922DA1FEE200167D94 /* ShazamService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		27C9D1942DA2148200167D94 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				27C9D1952DA2148200167D94 /* ShazamKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -166,16 +207,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27C9D1822DA1D16C00167D94 /* ConcertCreationViewModel.swift in Sources */,
 				27302F172B7FF82C00F72E8B /* ConcertPageView.swift in Sources */,
 				27302F152B7FE6DE00F72E8B /* ConcertItemView.swift in Sources */,
+				27C9D1932DA1FEE200167D94 /* ShazamService.swift in Sources */,
 				27302F0D2B7EDE9F00F72E8B /* PickerView.swift in Sources */,
 				27302EFF2B7ED54200F72E8B /* ContentView.swift in Sources */,
+				27C9D1902DA1DDBE00167D94 /* ConcertPageViewModel.swift in Sources */,
 				27302F192B8004E000F72E8B /* Song.swift in Sources */,
-				27302F012B7ED54200F72E8B /* Item.swift in Sources */,
 				27302F112B7FE02600F72E8B /* ConcertCreationSheet.swift in Sources */,
 				27302EFD2B7ED54200F72E8B /* BarricadeApp.swift in Sources */,
 				27302F132B7FE07800F72E8B /* Concert.swift in Sources */,
-				27302F0F2B7FDCE300F72E8B /* ConcertsView.swift in Sources */,
 				27302F1B2B8007F600F72E8B /* SongPageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -307,13 +349,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Barricade.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Barricade/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = BL59DC94Z6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Barricade/Info.plist;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Barricade;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed to identify songs at concerts";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -337,13 +383,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Barricade.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Barricade/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = BL59DC94Z6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Barricade/Info.plist;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Barricade;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed to identify songs at concerts";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

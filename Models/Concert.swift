@@ -34,7 +34,6 @@ final class Concert {
             let currentDate = Date()
             let components = calendar.dateComponents([.day], from: currentDate, to: date)
             
-            // The result can be positive (days to the future) or negative (days since the past)
             return abs(components.day ?? 0)
         }
 }
