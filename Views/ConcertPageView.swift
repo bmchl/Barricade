@@ -28,94 +28,147 @@ struct ConcertPageView: View {
     @State private var savedVideoURL: URL?
     @State private var videoData: Data?
     @State private var isLoading = false
+    @State private var showEditSheet = false
+    @State private var detectedSong: ShazamMatchResult?
 
+    @ViewBuilder
+    private func songsSection() -> some View {
+        Section {
+            ForEach(concert.setlist) { song in
+                NavigationLink {
+                    SongPageView(song:.constant(song))
+                } label: {
+                    VStack(alignment: .leading) {
+                        Text(song.title)
+                        if !song.artist.isEmpty {
+                            Text(song.artist)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+            .onMove { from, to in
+                concert.setlist.move(fromOffsets: from, toOffset: to)
+                try? modelContext.save()
+            }
+        } header: {
+            HStack {
+                Text("Setlist")
+                Spacer()
+                EditButton()
+            }
+        }
+        .listRowBackground(Color.white.opacity(0.1))
+    }
+    
+    @ViewBuilder
+    private func infoSection() -> some View {
+        Section("Information") {
+            LabeledContent {
+                Text(concert.artist).foregroundStyle(.primary)
+            } label: {
+                Text("Artist").foregroundStyle(.secondary)
+            }
+            LabeledContent {
+                Text(concert.city).foregroundStyle(.primary)
+            } label: {
+                Text("City").foregroundStyle(.secondary)
+            }
+            LabeledContent {
+                Text(concert.date.formatted(date: .long, time: .omitted)).foregroundStyle(.primary)
+            } label: {
+                Text("Date").foregroundStyle(.secondary)
+            }
+        }.listRowBackground(Color.white.opacity(0.1))
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
-                // TODO: Insert playback of concert song videos in order
                 Form {
-                    Section("Setlist") {
-                        ForEach(concert.setlist) { song in
-                            NavigationLink {
-                                SongPageView(song:.constant(song))
-                            } label: {
-                                HStack {
-                                    Text(song.title)
-                                    Spacer()
-                                    if !song.artist.isEmpty {
-                                        Text(song.artist)
-                                            .foregroundColor(.secondary)
-                                            .font(.caption)
-                                    }
-                                }
-                            }
-                        }
+                    infoSection()
+                    if (concert.isInFuture()){
+                        Section {
+                            VStack(alignment: .center, spacing: 12){
+                                Image(systemName: "calendar")
+                                    .foregroundColor(.secondary)
+                                    .scaleEffect(3.0).padding()
+                                Text("This concert is in \(concert.daysTo()) days, get excited!").foregroundStyle(.secondary).padding()
+                            }.frame(maxWidth: .infinity, alignment: .center).padding().padding(.top)
+                        }.listRowBackground(Color.white.opacity(0.1))
+                    } else {
+                        songsSection()
                     }
                 }
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        EditButton()
+                .scrollContentBackground(.hidden)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            concert.color.opacity(0.3),
+                            concert.color.opacity(0.1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            }
+            .navigationTitle(concert.tour)
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showEditSheet = true }) {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(.title3)
+                            .symbolRenderingMode(.hierarchical)
                     }
-                    ToolbarItem {
+                    .foregroundColor(.primary)
+                }
+                if (!concert.isInFuture())
+                {
+                    ToolbarItem(placement: .navigationBarTrailing) {
                         PhotosPicker(selection: $newClip, matching: .videos) {
                             Label("Add Item", systemImage: "plus")
-                        }.onChange(of: newClip) { newSelectedVideo, _ in
-                            Task {
-                                do {
-                                    loadState = .loading
-                                    isLoading = true
-                                    
-                                    if let movieData = try await newClip?.loadTransferable(type: Data.self) {
-                                        loadState = .loaded
-                                        self.videoData = movieData
-                                        
-                                        // Save the video first
-                                        if let savedURL = try? await saveVideoToFile(movieData) {
-                                            self.savedVideoURL = savedURL
-                                            self.navigateToVideoPlayer = true
-                                            isLoading = false
-                                        } else {
-                                            isLoading = false
-                                            showError("Failed to save video")
-                                        }
-                                    } else {
-                                        loadState = .failed("Failed to load video data")
-                                        isLoading = false
-                                        showError("Failed to load video data")
-                                    }
-                                } catch {
-                                    loadState = .failed(error.localizedDescription)
-                                    isLoading = false
-                                    showError("Error: \(error.localizedDescription)")
+                                .foregroundColor(.primary)
+                        }
+                        .onChange(of: newClip) { _, newSelectedVideo in
+                            if let video = newSelectedVideo {
+                                Task {
+                                    newClip = nil
+                                    await loadVideoForDetection(newSelectedVideo: video)
                                 }
                             }
                         }
                     }
                 }
-                .navigationTitle(concert.tour)
-                .onAppear {
-                    // Make sure the viewModel has a reference to our concert
-                    viewModel.setConcert(concert)
-                }
             }
-            .navigationDestination(isPresented: $navigateToVideoPlayer) {
+            .sheet(isPresented: $showEditSheet) {
+                ConcertCreationSheet(showConcertCreationSheet: $showEditSheet, concert: concert)
+            }
+            .fullScreenCover(isPresented: $navigateToVideoPlayer) {
                 if let videoURL = savedVideoURL, let data = videoData {
                     VideoDetectionView(
                         videoURL: videoURL,
                         videoData: data,
                         concert: $concert,
-                        modelContext: modelContext
+                        onSongDetected: { result in
+                            self.detectedSong = result
+                            navigateToVideoPlayer = false
+                        }
                     )
-                } else {
-                    Text("Error loading video")
                 }
             }
-            .alert("Error", isPresented: $showErrorAlert) {
-                Button("OK") {
-                    showErrorAlert = false
+            .sheet(item: $detectedSong) { result in
+                if let videoURL = savedVideoURL {
+                    SongCreationSheet(
+                        concert: concert,
+                        videoData: videoData,
+                        videoURL: videoURL,
+                        detectedSong: result
+                    )
                 }
-            } message: {
-                Text(errorMessage)
             }
             .overlay {
                 if isLoading {
@@ -142,6 +195,44 @@ struct ConcertPageView: View {
         }
     }
     
+    @MainActor
+    private func loadVideoForDetection(newSelectedVideo: PhotosPickerItem?) async {
+        do {
+            loadState = .loading
+            isLoading = true
+            
+            guard let selectedVideo = newSelectedVideo else {
+                loadState = .failed("No video selected")
+                isLoading = false
+                showError("No video selected")
+                return
+            }
+            
+            guard let movieData = try await selectedVideo.loadTransferable(type: Data.self) else {
+                loadState = .failed("Failed to load video data")
+                isLoading = false
+                showError("Failed to load video data")
+                return
+            }
+            
+            loadState = .loaded
+            self.videoData = movieData
+            
+            // Save the video first
+            if let savedURL = try? await saveVideoToFile(movieData) {
+                self.savedVideoURL = savedURL
+                self.navigateToVideoPlayer = true
+                isLoading = false
+            } else {
+                isLoading = false
+                showError("Failed to save video")
+            }
+        } catch {
+            loadState = .failed(error.localizedDescription)
+            isLoading = false
+            showError("Error: \(error.localizedDescription)")
+        }
+    }
     private func showError(_ message: String) {
         errorMessage = message
         showErrorAlert = true
@@ -161,5 +252,35 @@ struct ConcertPageView: View {
     // Helper function to get the documents directory
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+}
+
+#Preview {
+    do {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Concert.self, configurations: config)
+        
+        // Create a sample concert with some songs
+        let sampleConcert = Concert(
+            date: .now,
+            artist: "Taylor Swift",
+            tour: "Eras Tour",
+            city: "Tokyo",
+            colorHex: "FF1493"  // Deep pink color
+        )
+        
+        // Add some sample songs to the setlist
+        sampleConcert.setlist.append(Song(title: "Cruel Summer", artist: "Taylor Swift"))
+        sampleConcert.setlist.append(Song(title: "Anti-Hero", artist: "Taylor Swift"))
+        sampleConcert.setlist.append(Song(title: "Love Story", artist: "Taylor Swift"))
+        sampleConcert.setlist.append(Song(title: "Shake It Off", artist: "Taylor Swift"))
+        
+        return NavigationStack {
+            ConcertPageView(concert: .constant(sampleConcert))
+                .modelContainer(container)
+        }
+        .preferredColorScheme(.dark)
+    } catch {
+        return Text("Failed to create preview: \(error.localizedDescription)")
     }
 }

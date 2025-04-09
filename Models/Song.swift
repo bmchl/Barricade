@@ -9,17 +9,45 @@ import Foundation
 import SwiftData
 
 @Model
-final class Song {
+final class Song: Identifiable, Equatable, Hashable {
+    var id: UUID
     var title: String
     var artist: String
     var link: String
-    var clips: [URL]
+    var clipPaths: [String]
     
-    init(title: String, artist: String = "") {
+    var clips: [URL] {
+        get {
+            clipPaths.map { URL(fileURLWithPath: $0) }
+        }
+        set {
+            clipPaths = newValue.map { $0.path }
+        }
+    }
+    
+    var concert: Concert?
+
+    init(
+        title: String,
+        artist: String = "",
+        link: String = "",
+        clips: [URL] = [],
+        concert: Concert? = nil
+    ) {
+        self.id = UUID()
         self.title = title
         self.artist = artist
-        self.link = ""
-        self.clips = []
+        self.link = link
+        self.clipPaths = clips.map { $0.path }
+        self.concert = concert
+    }
+
+    static func == (lhs: Song, rhs: Song) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 

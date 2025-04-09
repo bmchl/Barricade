@@ -26,7 +26,7 @@ struct BarricadeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().preferredColorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
     }

@@ -1,3 +1,10 @@
+//
+//  VideoDetectionView.swift
+//  Barricade
+//
+//  Created by Michael Banna on 2025-04-08.
+//
+
 import SwiftUI
 import AVKit
 import SwiftData
@@ -7,10 +14,10 @@ struct VideoDetectionView: View {
     let videoURL: URL
     let videoData: Data
     @Binding var concert: Concert
-    let modelContext: ModelContext
+    var onSongDetected: ((ShazamMatchResult) -> Void)?
     
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel = VideoDetectionViewModel()
+    @State private var viewModel = ViewModel()
     @State private var showAlertOnDismiss = false
     @State private var showManualEntrySheet = false
     @State private var manualSongTitle = ""
@@ -18,48 +25,38 @@ struct VideoDetectionView: View {
     
     var body: some View {
         VStack {
-            // Video player takes full width and most of the height
             VideoPlayer(player: viewModel.player)
                 .edgesIgnoringSafeArea(.all)
                 .overlay(
-                    VStack {
-                        Spacer()
+                    Group {
                         if viewModel.isDetecting {
-                            Text("Identifying song...")
-                                .font(.headline)
-                                .padding()
-                                .background(.ultraThinMaterial)
-                                .cornerRadius(10)
-                        } else if let songTitle = viewModel.detectedSong {
-                            VStack(spacing: 4) {
-                                Text("Song detected:")
-                                    .font(.subheadline)
-                                Text(songTitle)
-                                    .font(.headline)
-                                if let artist = viewModel.detectedArtist {
-                                    Text(artist)
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(10)
-                        } else if viewModel.noMatchFound {
-                            VStack(spacing: 8) {
-                                Text("No song detected")
-                                    .font(.headline)
-                                
-                                Button("Add Song Manually") {
-                                    showManualEntrySheet = true
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .controlSize(.small)
-                            }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(10)
+                            // Transparent touch-blocking overlay
+                            Color.black.opacity(0.001)
+                                .allowsHitTesting(true)
                         }
+                    }
+                )
+                .overlay(
+                    VStack(alignment: .leading) {
+                        Spacer()
+                        ZStack(alignment: .leading) {
+                            if viewModel.isDetecting {
+                                identifyingSongView()
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                            } else if let songTitle = viewModel.detectedSong {
+                                matchFoundView(songTitle: songTitle, artist: viewModel.detectedArtist)
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                            } else if viewModel.noMatchFound {
+                                noMatchFoundView()
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                            }
+                        }
+                        .padding()
+                        .background(.barricadeDark)
+                        .cornerRadius(30)
+                        .padding(.horizontal)
+                        .animation(.easeInOut(duration: 0.35), value: viewModel.isDetecting || viewModel.detectedSong != nil || viewModel.noMatchFound)
+                        
                         Spacer().frame(height: 40)
                     }
                 )
@@ -79,164 +76,127 @@ struct VideoDetectionView: View {
         }
         .onAppear {
             viewModel.setup(videoURL: videoURL)
-            viewModel.startDetection(videoData: videoData, concert: concert, modelContext: modelContext)
+            viewModel.startDetection(
+                videoData: videoData,
+                concert: concert,
+                onSongDetected: onSongDetected
+            )
         }
         .onDisappear {
             viewModel.stopDetection()
         }
-        .alert("Song Detection in Progress", isPresented: $showAlertOnDismiss) {
-            Button("Cancel", role: .destructive) {
-                viewModel.stopDetection()
+    }
+    
+    func identifyingSongView() -> some View {
+        HStack(alignment:.center) {
+            VStack(alignment: .leading) {
+                Label("Volume up!", systemImage: "speaker.wave.3.fill")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                Text("Identifying song...")
+                    .font(.title).fontWeight(.bold)
+            }
+            Spacer()
+            ProgressView().scaleEffect(2.0).frame(width: 80, height: 80)
+        }.frame(maxWidth: .infinity)
+    }
+    
+    func matchFoundView(songTitle: String, artist: String?) -> some View {
+        VStack{
+            HStack(alignment: .center) {
+                VStack(alignment: .leading) {
+                    Label("Match found!", systemImage: "checkmark.circle.fill")
+                        .font(.headline)
+                        .foregroundColor(.green)
+                    
+                    Text(songTitle)
+                        .font(.title)
+                        .fontWeight(.bold)
+                    
+                    if let artist = artist {
+                        Text(artist)
+                            .font(.title2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Spacer()
+                
+                if let artworkURL = viewModel.currentMatchResult?.artworkURL {
+                    AsyncImage(url: artworkURL) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 80, height: 80)
+                                .cornerRadius(10)
+                        case .failure(_):
+                            EmptyView()
+                        case .empty:
+                            ProgressView()
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                }
+            }
+            
+            Button(action: {
+                print("current result")
+                print("song: \(viewModel.currentMatchResult?.songTitle ?? "none")")
+                if let result = viewModel.currentMatchResult {
+                    onSongDetected?(result)
+                }
                 dismiss()
+            }) {
+                Label("Confirm & Continue", systemImage: "checkmark.circle.fill")
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(.barricadeDark)
+                    .font(.headline)
+                    .padding()
+                    .background(.accent)
+                    .cornerRadius(10)
             }
-            Button("Continue Detection", role: .cancel) {
-                // Just close the alert and continue
-            }
-        } message: {
-            Text("Song detection is still running. Do you want to cancel it?")
-        }
-        .sheet(isPresented: $showManualEntrySheet) {
-            NavigationStack {
-                Form {
-                    Section("Song Details") {
-                        TextField("Song Title", text: $manualSongTitle)
-                        TextField("Artist (optional)", text: $manualArtistName)
-                    }
+            .buttonStyle(.plain)
+        }.frame(maxWidth: .infinity)
+    }
+    
+    func noMatchFoundView() -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("No match found", systemImage: "xmark.circle.fill")
+                .font(.headline)
+                .foregroundColor(.red)
+            
+            Text("Try adding manually")
+                .font(.title)
+                .fontWeight(.bold)
+            
+            Button(action: {
+                if let result = viewModel.currentMatchResult {
+                    onSongDetected?(result)
                 }
-                .navigationTitle("Add Song Manually")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            showManualEntrySheet = false
-                        }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Save") {
-                            if !manualSongTitle.isEmpty {
-                                viewModel.addManualSong(
-                                    title: manualSongTitle,
-                                    artist: manualArtistName,
-                                    url: videoURL,
-                                    concert: concert,
-                                    modelContext: modelContext
-                                )
-                                showManualEntrySheet = false
-                            }
-                        }
-                        .disabled(manualSongTitle.isEmpty)
-                    }
-                }
+                dismiss()
+            }) {
+                Label("Continue", systemImage: "arrow.right.circle.fill")
+                    .frame(maxWidth: .infinity)
+                    .font(.headline)
+                    .padding()
+                    .background(Color.accentColor2)
+                    .cornerRadius(10)
             }
-            .presentationDetents([.medium])
-        }
+            .buttonStyle(.plain)
+        }.frame(maxWidth: .infinity)
     }
 }
 
-class VideoDetectionViewModel: ObservableObject {
-    @Published var player: AVPlayer?
-    @Published var isDetecting = false
-    @Published var detectedSong: String?
-    @Published var detectedArtist: String?
-    @Published var error: Error?
-    @Published var noMatchFound = false
-    
-    private let shazamService = ShazamService.shared
-    private var detectionTask: Task<Void, Never>?
-    private var videoURL: URL?
-    
-    func setup(videoURL: URL) {
-        self.videoURL = videoURL
-        // Don't create a player here, we'll use the one from ShazamService
-    }
-    
-    func startDetection(videoData: Data, concert: Concert, modelContext: ModelContext) {
-        isDetecting = true
-        
-        guard let videoURLForSaving = self.videoURL else {
-            print("Error: No video URL available")
-            return
-        }
-        
-        detectionTask = Task {
-            // Start song detection using ShazamKit
-            let (returnedPlayer, result) = await shazamService.matchAudioData(videoData)
-            
-            // Set the player from ShazamService
-            await MainActor.run {
-                self.player = returnedPlayer
-                isDetecting = false
-                
-                if result.isSuccess, let songTitle = result.songTitle {
-                    self.detectedSong = songTitle
-                    self.detectedArtist = result.artist
-                    
-                    // Save the detected song if it's not already in the setlist
-                    if !concert.setlist.contains(where: { $0.title == songTitle }) {
-                        let newSong = Song(title: songTitle, artist: result.artist ?? "")
-                        newSong.clips.append(videoURLForSaving)
-                        concert.setlist.append(newSong)
-                        try? modelContext.save()
-                    } else if let existingSong = concert.setlist.first(where: { $0.title == songTitle }) {
-                        // Add this clip to the existing song
-                        if !existingSong.clips.contains(videoURLForSaving) {
-                            existingSong.clips.append(videoURLForSaving)
-                            try? modelContext.save()
-                        }
-                    }
-                } else {
-                    // No match found, show manual entry option
-                    self.noMatchFound = true
-                    self.error = result.error
-                    
-                    if let error = result.error {
-                        print("Song detection failed: \(error.localizedDescription)")
-                    } else {
-                        print("No match found for the song")
-                    }
-                }
-            }
-        }
-    }
-    
-    func stopDetection() {
-        detectionTask?.cancel()
-        player?.pause()
-        player = nil
-        shazamService.stopPlayback()
-    }
-    
-    func addManualSong(title: String, artist: String, url: URL, concert: Concert, modelContext: ModelContext) {
-        // Update the view model properties
-        self.detectedSong = title
-        self.detectedArtist = artist.isEmpty ? nil : artist
-        self.noMatchFound = false
-        
-        // Check if the song already exists in the setlist
-        if !concert.setlist.contains(where: { $0.title == title }) {
-            // Create a new song with the provided details
-            let newSong = Song(title: title, artist: artist)
-            newSong.clips.append(url)
-            concert.setlist.append(newSong)
-        } else if let existingSong = concert.setlist.first(where: { $0.title == title }) {
-            // Add this clip to the existing song
-            if !existingSong.clips.contains(url) {
-                existingSong.clips.append(url)
-            }
-        }
-        
-        // Save to the database
-        try? modelContext.save()
-    }
-}
+
 
 #Preview {
     NavigationStack {
         VideoDetectionView(
             videoURL: URL(string: "https://example.com/video.mp4")!,
             videoData: Data(),
-            concert: .constant(placeholderConcert),
-            modelContext: ModelContext(try! ModelContainer(for: Concert.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))
-        )
+            concert: .constant(placeholderConcert))
     }
-} 
+}

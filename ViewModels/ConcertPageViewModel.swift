@@ -33,9 +33,8 @@ extension ConcertPageView {
         func processVideoData(_ data: Data, modelContext: ModelContext) async -> ShazamMatchResult {
             isDetecting = true
             
-            // Use ShazamKit to detect song from the video data, also get the player
-            let (player, result) = await shazamService.matchAudioData(data)
-            self.currentPlayer = player
+            // Use ShazamKit to detect song from the video data
+            let result = await shazamService.matchAudioData(data, player: currentPlayer!)
             self.detectionResult = result
             
             if result.isSuccess, let songTitle = result.songTitle {
@@ -64,7 +63,7 @@ extension ConcertPageView {
         // Call this when detection is complete or canceled
         func stopDetection() {
             isDetecting = false
-            shazamService.stopPlayback()
+            shazamService.stopDetection()
             currentPlayer = nil
         }
         
