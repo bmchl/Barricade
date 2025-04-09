@@ -13,6 +13,7 @@ final class Song: Identifiable, Equatable, Hashable {
     var id: UUID
     var title: String
     var artist: String
+    var order: Int
     var link: String
     var clipPaths: [String]
     
@@ -30,12 +31,14 @@ final class Song: Identifiable, Equatable, Hashable {
     init(
         title: String,
         artist: String = "",
+        order: Int,
         link: String = "",
         clips: [URL] = [],
         concert: Concert? = nil
     ) {
         self.id = UUID()
         self.title = title
+        self.order = order
         self.artist = artist
         self.link = link
         self.clipPaths = clips.map { $0.path }
@@ -51,4 +54,4 @@ final class Song: Identifiable, Equatable, Hashable {
     }
 }
 
-var placeholderSong = Song(title: "better off", artist: "Ariana Grande")
+var placeholderSong = Song(title: "better off", artist: "Ariana Grande", order: 0)

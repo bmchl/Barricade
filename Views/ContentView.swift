@@ -65,12 +65,25 @@ struct ContentView: View {
     }
 }
 
+import SwiftUI
+import SwiftData
+
 struct ConcertsTab: View {
     let items: [Concert]
     @Binding var concertType: Int
     @Binding var sortOption: SortOption
     @Binding var showConcertCreationSheet: Bool
     
+    @Environment(\.modelContext) private var modelContext
+
+    private var filteredConcerts: [Concert] {
+        if concertType == 0 {
+            return items.filter { !$0.isInFuture() }
+        } else {
+            return items.filter { $0.isInFuture() }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -80,7 +93,7 @@ struct ConcertsTab: View {
                         Text("Upcoming").tag(1)
                     }
                     .pickerStyle(.segmented)
-                    
+
                     Picker("Sort By", selection: $sortOption) {
                         Text("Date").tag(SortOption.date)
                         Text("Artist").tag(SortOption.artist)
@@ -89,33 +102,46 @@ struct ConcertsTab: View {
                     .pickerStyle(.menu)
                 }
                 .padding(.horizontal)
-                
-                ScrollView {
-                    if concertType == 0 {
-                        ForEach(items) { item in
-                            if !item.isInFuture() {
-                                VStack {
-                                    NavigationLink {
-                                        ConcertPageView(concert: .constant(item))
-                                    } label: {
-                                        ConcertItemView(concert: .constant(item))
-                                    }
-                                    .padding(.horizontal)
-                                    .padding(.top, 5)
-                                }
-                            }
+
+                if filteredConcerts.isEmpty {
+                    GeometryReader { geo in
+                        VStack(spacing: 16) {
+                            Image(systemName: "ticket")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 60, height: 60)
+                                .foregroundColor(.white.opacity(0.6))
+
+                            Text("No concerts yet")
+                                .font(.title3)
+                                .bold()
+                                .foregroundColor(.white)
+
+                            Text("Tap the plus icon to add your first concert.")
+                                .font(.body)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
                         }
-                    } else {
-                        ForEach(items) { item in
-                            if item.isInFuture() {
-                                VStack {
-                                    NavigationLink {
-                                        ConcertPageView(concert: .constant(item))
+                        .frame(width: geo.size.width, height: geo.size.height)
+                    }
+                } else {
+                    ScrollView {
+                        ForEach(filteredConcerts) { item in
+                            VStack {
+                                NavigationLink {
+                                    ConcertPageView(concert: .constant(item))
+                                } label: {
+                                    ConcertItemView(concert: .constant(item))
+                                }
+                                .padding(.horizontal)
+                                .padding(.top, 5)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        deleteConcert(item)
                                     } label: {
-                                        ConcertItemView(concert: .constant(item))
+                                        Label("Delete Concert", systemImage: "trash")
                                     }
-                                    .padding(.horizontal)
-                                    .padding(.top, 5)
                                 }
                             }
                         }
@@ -125,9 +151,6 @@ struct ConcertsTab: View {
             .background(.barricadeBackground)
             .frame(maxWidth: .infinity, alignment: .center)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
                 ToolbarItem {
                     Button(action: { showConcertCreationSheet = true }) {
                         Label("Add Item", systemImage: "plus")
@@ -136,6 +159,11 @@ struct ConcertsTab: View {
             }
             .navigationTitle("Concerts")
         }
+    }
+
+    private func deleteConcert(_ concert: Concert) {
+        modelContext.delete(concert)
+        try? modelContext.save()
     }
 }
 

@@ -10,10 +10,7 @@ import SwiftData
 import SwiftUI
 
 @Model
-final class Concert: Equatable {
-    static func == (lhs: Concert, rhs: Concert) -> Bool {
-        lhs === rhs
-    }
+final class Concert {
     var date: Date
     var artist: String
     var tour: String

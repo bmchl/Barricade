@@ -34,22 +34,42 @@ struct ConcertPageView: View {
     @ViewBuilder
     private func songsSection() -> some View {
         Section {
-            ForEach(concert.setlist) { song in
-                NavigationLink {
-                    SongPageView(song:.constant(song))
-                } label: {
-                    VStack(alignment: .leading) {
-                        Text(song.title)
-                        if !song.artist.isEmpty {
-                            Text(song.artist)
-                                .foregroundColor(.secondary)
-                        }
+            if concert.setlist.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "music.note.list")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(.white.opacity(0.6))
+                    
+                    Text("No songs in the setlist")
+                        .font(.title3)
+                        .bold()
+                        .foregroundColor(.white)
+                    
+                    Text("Tap the plus icon to add a song from a concert clip.")
+                        .font(.body)
+                        .foregroundColor(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical)
+            } else {
+                ForEach(concert.setlist.sorted(by: { $0.order < $1.order })) { song in
+                    NavigationLink {
+                        SongPageView(song: .constant(song))
+                    } label: {
+                        SongRowWithThumbnail(song: song)
                     }
                 }
-            }
-            .onMove { from, to in
-                concert.setlist.move(fromOffsets: from, toOffset: to)
-                try? modelContext.save()
+                .onMove { indices, newOffset in
+                    concert.setlist.move(fromOffsets: indices, toOffset: newOffset)
+                    for (index, song) in concert.setlist.enumerated() {
+                        song.order = index
+                    }
+                    try? modelContext.save()
+                }
             }
         } header: {
             HStack {
@@ -65,19 +85,19 @@ struct ConcertPageView: View {
     private func infoSection() -> some View {
         Section("Information") {
             LabeledContent {
-                Text(concert.artist).foregroundStyle(.primary)
+                Text(concert.artist)
             } label: {
-                Text("Artist").foregroundStyle(.secondary)
+                Text("Artist")
             }
             LabeledContent {
-                Text(concert.city).foregroundStyle(.primary)
+                Text(concert.city)
             } label: {
-                Text("City").foregroundStyle(.secondary)
+                Text("City")
             }
             LabeledContent {
-                Text(concert.date.formatted(date: .long, time: .omitted)).foregroundStyle(.primary)
+                Text(concert.date.formatted(date: .long, time: .omitted))
             } label: {
-                Text("Date").foregroundStyle(.secondary)
+                Text("Date")
             }
         }.listRowBackground(Color.white.opacity(0.1))
     }
@@ -130,8 +150,7 @@ struct ConcertPageView: View {
                 {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         PhotosPicker(selection: $newClip, matching: .videos) {
-                            Label("Add Item", systemImage: "plus")
-                                .foregroundColor(.primary)
+                            Image(systemName: "plus.circle.fill").font(.title3).symbolRenderingMode(.hierarchical)
                         }
                         .onChange(of: newClip) { _, newSelectedVideo in
                             if let video = newSelectedVideo {
@@ -270,10 +289,10 @@ struct ConcertPageView: View {
         )
         
         // Add some sample songs to the setlist
-        sampleConcert.setlist.append(Song(title: "Cruel Summer", artist: "Taylor Swift"))
-        sampleConcert.setlist.append(Song(title: "Anti-Hero", artist: "Taylor Swift"))
-        sampleConcert.setlist.append(Song(title: "Love Story", artist: "Taylor Swift"))
-        sampleConcert.setlist.append(Song(title: "Shake It Off", artist: "Taylor Swift"))
+        sampleConcert.setlist.append(Song(title: "Cruel Summer", artist: "Taylor Swift", order: 0))
+        sampleConcert.setlist.append(Song(title: "Anti-Hero", artist: "Taylor Swift", order: 1))
+        sampleConcert.setlist.append(Song(title: "Love Story", artist: "Taylor Swift", order: 2))
+        sampleConcert.setlist.append(Song(title: "Shake It Off", artist: "Taylor Swift", order: 3))
         
         return NavigationStack {
             ConcertPageView(concert: .constant(sampleConcert))

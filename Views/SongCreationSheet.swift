@@ -124,18 +124,24 @@ struct SongCreationSheet: View {
             if let videoData = videoData {
                 do {
                     let fileName = "\(UUID().uuidString).mov"
-                    let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
+                    let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                        .appendingPathComponent(fileName)
                     try videoData.write(to: fileURL)
 
                     await MainActor.run {
                         let newSong = Song(
                             title: songTitle,
-                            artist: artistName
+                            artist: artistName,
+                            order: 0
                         )
+                        
+                        // Set order based on setlist count
+                        newSong.order = concert.setlist.count
+
                         newSong.clips.append(fileURL)
                         concert.setlist.append(newSong)
-                        try? modelContext.save()
 
+                        try? modelContext.save()
                         dismiss()
                     }
                 } catch {

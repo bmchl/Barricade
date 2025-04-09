@@ -75,7 +75,16 @@ struct SongPageView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .background(Color.barricadeDark)
+        .background(
+            LinearGradient(
+                colors: [
+                    song.concert?.color.opacity(0.3) ?? Color.black.opacity(0.3),
+                    song.concert?.color.opacity(0.1) ?? Color.black.opacity(0.1)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

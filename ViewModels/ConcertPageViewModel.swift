@@ -32,30 +32,33 @@ extension ConcertPageView {
         @MainActor
         func processVideoData(_ data: Data, modelContext: ModelContext) async -> ShazamMatchResult {
             isDetecting = true
-            
+
             // Use ShazamKit to detect song from the video data
             let result = await shazamService.matchAudioData(data, player: currentPlayer!)
             self.detectionResult = result
-            
-            if result.isSuccess, let songTitle = result.songTitle {
-                // Check if the song already exists in the setlist
-                if let concert = findConcert(in: modelContext),
-                   !concert.setlist.contains(where: { $0.title == songTitle }) {
-                    // Create and add the new song to the setlist
-                    let newSong = Song(title: songTitle)
-                    
-                    if let artist = result.artist {
-                        // Add artist information if available
-                        newSong.artist = artist
-                    }
-                    
-                    // Add the song to the concert setlist
-                    concert.setlist.append(newSong)
-                    
-                    // Save changes to the model context
-                    try? modelContext.save()
-                }
-            }
+
+//            if result.isSuccess, let songTitle = result.songTitle {
+//                // Check if the song already exists in the setlist
+//                if let concert = findConcert(in: modelContext),
+//                   !concert.setlist.contains(where: { $0.title == songTitle }) {
+//                    
+//                    // Create the new song
+//                    let newSong = Song(title: songTitle, order: 0)
+//                    
+//                    if let artist = result.artist {
+//                        newSong.artist = artist
+//                    }
+//
+//                    // Assign order based on current setlist size
+//                    newSong.order = concert.setlist.count
+//                    
+//                    // Add the song to the setlist
+//                    concert.setlist.append(newSong)
+//                    
+//                    // Save changes to the model context
+//                    try? modelContext.save()
+//                }
+//            }
             
             return result
         }

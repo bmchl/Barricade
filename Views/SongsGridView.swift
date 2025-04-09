@@ -25,23 +25,53 @@ struct SongsGridView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(songsWithClips, id: \.id) { song in 
-                        NavigationLink {
-                            SongPageView(song: .constant(song))
-                        } label: {
-                            SongGridItem(song: song)
+                if songsWithClips.isEmpty {
+                    VStack {
+                        Spacer()
+                        VStack(spacing: 16) {
+                            Image(systemName: "music.note.list")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 60, height: 60)
+                                .foregroundColor(.white.opacity(0.6))
+
+                            Text("No songs yet")
+                                .font(.title3)
+                                .bold()
+                                .foregroundColor(.white)
+
+                            Text("Tap the plus icon to add a video and detect a song.")
+                                .font(.body)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        Spacer()
+                    }
+                    .frame(maxHeight: .infinity)
+                    .padding()
+                } else {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(songsWithClips, id: \.id) { song in
+                            NavigationLink {
+                                SongPageView(song: .constant(song))
+                            } label: {
+                                SongGridItem(song: song)
+                            }
                         }
                     }
+                    .padding()
                 }
-                .padding()
             }
+            .frame(maxHeight: .infinity)
             .background(.barricadeBackground)
             .navigationTitle("Songs")
             .toolbar {
                 ToolbarItem {
                     PhotosPicker(selection: $newClip, matching: .videos) {
-                        Label("Add Song", systemImage: "plus")
+                        Image(systemName: "plus.circle.fill").font(.title3).symbolRenderingMode(.hierarchical)
                     }
                 }
             }
@@ -87,8 +117,6 @@ struct SongsGridView: View {
                         colorHex: "FF6B6B"
                     )),
                     onSongDetected: { result in
-                        print("onsongdetected")
-                        print("Detected song result: \(result.songTitle)")
                         self.detectedSong = result
                         self.showVideoDetection = false
                     }
