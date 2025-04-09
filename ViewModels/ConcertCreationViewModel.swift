@@ -50,13 +50,10 @@ extension ConcertCreationSheet {
         
         @MainActor
         func loadPreviousCities() {
-            // Use either the existing concert's context or the provided context
             guard let context = existingConcert?.modelContext ?? modelContext else { return }
             
-            // Fetch all concerts
             let descriptor = FetchDescriptor<Concert>()
             if let concerts = try? context.fetch(descriptor) {
-                // Get unique cities and sort them
                 let cities = Set(concerts.map { $0.city })
                 previousCities = Array(cities).filter { !$0.isEmpty }.sorted()
             }
@@ -70,11 +67,9 @@ extension ConcertCreationSheet {
 
         @MainActor
         func saveChanges(modelContext: ModelContext) {
-            // Convert color to hex string for storage
             let hexColor = selectedColor.toHex() ?? "FF6B6B"
             
             if let existingConcert = existingConcert {
-                // Update existing concert
                 existingConcert.artist = artist
                 existingConcert.date = concertDate
                 existingConcert.tour = tour
@@ -82,7 +77,6 @@ extension ConcertCreationSheet {
                 existingConcert.nickname = nickname
                 existingConcert.colorHex = hexColor
             } else {
-                // Create new concert
                 let newConcert = Concert(
                     date: concertDate,
                     artist: artist,

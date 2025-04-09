@@ -17,24 +17,6 @@ struct ShazamMatchResult: Identifiable {
     let appleMusicURL: URL?
     let error: Error?
     
-//    // This one stays the same
-//    init(
-//        songTitle: String?,
-//        artist: String?,
-//        artworkURL: URL? = nil,
-//        appleMusicURL: URL? = nil,
-//        error: Error? = nil,
-//        id: UUID = UUID()
-//    ) {
-//        self.songTitle = songTitle
-//        self.artist = artist
-//        self.artworkURL = artworkURL
-//        self.appleMusicURL = appleMusicURL
-//        self.error = error
-//        self.id = id
-//    }
-
-    // Disambiguate with a label
     init(from match: SHMatch?, error: Error? = nil) {
         self.songTitle = match?.mediaItems.first?.title
         self.artist = match?.mediaItems.first?.artist
@@ -105,14 +87,4 @@ class ShazamService: NSObject {
         managedSession = nil
         try? AVAudioSession.sharedInstance().setActive(false)
     }
-    
-//    // Return mock data for simulator testing
-//    private func mockShazamResult() -> ShazamMatchResult {
-//        return ShazamMatchResult(
-//            songTitle: "Sweetener (Simulator Mock)",
-//            artist: "Ariana Grande",
-//            artworkURL: URL(string: "https://example.com/artwork.jpg"),
-//            appleMusicURL: URL(string: "https://music.apple.com/example")
-//        )
-//    }
 }

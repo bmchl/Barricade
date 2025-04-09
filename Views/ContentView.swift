@@ -132,7 +132,7 @@ struct ConcertsTab: View {
                                 NavigationLink {
                                     ConcertPageView(concert: .constant(item))
                                 } label: {
-                                    ConcertItemView(concert: .constant(item))
+                                    ConcertItem(concert: .constant(item))
                                 }
                                 .padding(.horizontal)
                                 .padding(.top, 5)

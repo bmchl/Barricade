@@ -60,7 +60,7 @@ struct ConcertPageView: View {
                     NavigationLink {
                         SongPageView(song: .constant(song))
                     } label: {
-                        SongRowWithThumbnail(song: song)
+                        SongRowItem(song: song)
                     }
                 }
                 .onMove { indices, newOffset in

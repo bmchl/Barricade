@@ -18,7 +18,6 @@ extension ConcertPageView {
         var detectionResult: ShazamMatchResult?
         var currentPlayer: AVPlayer?
         
-        // Helper to find the current concert
         private var concert: Concert?
         
         init(shazamService: ShazamService = .shared) {
@@ -33,51 +32,23 @@ extension ConcertPageView {
         func processVideoData(_ data: Data, modelContext: ModelContext) async -> ShazamMatchResult {
             isDetecting = true
 
-            // Use ShazamKit to detect song from the video data
             let result = await shazamService.matchAudioData(data, player: currentPlayer!)
             self.detectionResult = result
-
-//            if result.isSuccess, let songTitle = result.songTitle {
-//                // Check if the song already exists in the setlist
-//                if let concert = findConcert(in: modelContext),
-//                   !concert.setlist.contains(where: { $0.title == songTitle }) {
-//                    
-//                    // Create the new song
-//                    let newSong = Song(title: songTitle, order: 0)
-//                    
-//                    if let artist = result.artist {
-//                        newSong.artist = artist
-//                    }
-//
-//                    // Assign order based on current setlist size
-//                    newSong.order = concert.setlist.count
-//                    
-//                    // Add the song to the setlist
-//                    concert.setlist.append(newSong)
-//                    
-//                    // Save changes to the model context
-//                    try? modelContext.save()
-//                }
-//            }
             
             return result
         }
         
-        // Call this when detection is complete or canceled
         func stopDetection() {
             isDetecting = false
             shazamService.stopDetection()
             currentPlayer = nil
         }
         
-        // Helper to find the current concert
         private func findConcert(in modelContext: ModelContext) -> Concert? {
-            // If we have a reference to the concert, use it
             if let concert = self.concert {
                 return concert
             }
             
-            // Otherwise try to find it in the model context
             let descriptor = FetchDescriptor<Concert>()
             guard let concerts = try? modelContext.fetch(descriptor),
                   let concert = concerts.first else {
