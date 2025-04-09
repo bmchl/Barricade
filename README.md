@@ -6,6 +6,11 @@
 
 Barricade is an iOS app designed for concert enthusiasts who want to document and remember their live music experiences. The app allows users to track concerts they've attended, record setlists, and automatically identify songs using Shazam integration. Built with modern Swift technologies, Barricade offers a beautiful, intuitive interface for preserving your concert memories.
 
+## Try it out
+
+Test Barricade on your iOS device through TestFlight:
+[Join the Barricade Beta](https://testflight.apple.com/join/tRMvRpA4)
+
 ## Technology Stack
 
 -   **Framework**: SwiftUI - Apple's modern declarative UI framework
