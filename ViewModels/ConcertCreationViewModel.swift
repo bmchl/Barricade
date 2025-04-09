@@ -33,9 +33,7 @@ extension ConcertCreationSheet {
             Color(hex: "1A535C") ?? .blue    // Dark Teal
         ]
         
-        @MainActor
-        init(concert: Concert? = nil, modelContext: ModelContext? = nil) {
-            self.modelContext = modelContext
+        init(concert: Concert? = nil) {
             if let concert = concert {
                 self.artist = concert.artist
                 self.concertDate = concert.date
@@ -48,7 +46,6 @@ extension ConcertCreationSheet {
             loadPreviousCities()
         }
         
-        @MainActor
         func loadPreviousCities() {
             guard let context = existingConcert?.modelContext ?? modelContext else { return }
             

@@ -14,6 +14,7 @@ struct ConcertCreationSheet: View {
     @State private var viewModel: ViewModel
     var onConcertCreated: ((Concert) -> Void)?
     
+    @MainActor
     init(showConcertCreationSheet: Binding<Bool>, concert: Concert? = nil, onConcertCreated: ((Concert) -> Void)? = nil) {
         self._showConcertCreationSheet = showConcertCreationSheet
         self.onConcertCreated = onConcertCreated
