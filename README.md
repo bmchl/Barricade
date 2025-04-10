@@ -8,8 +8,8 @@ Barricade is an iOS app designed for concert enthusiasts who want to document an
 
 ## Try it out
 
-Test Barricade on your iOS device through TestFlight:
-[Join the Barricade Beta](https://testflight.apple.com/join/tRMvRpA4)
+Download Barricade on the App Store:
+[Download Barricade](https://apps.apple.com/ca/app/barricade-concert-videos/id6744342704)
 
 ## Technology Stack
 
